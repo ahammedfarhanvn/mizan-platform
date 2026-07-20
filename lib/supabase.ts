@@ -3,7 +3,7 @@ import type { AppointmentRecord, CaseRecord, CaseType, KnowledgeArticle, MasalaQ
 import { normalizeMadhhab } from "./models";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 export const supabase = url && key && !url.includes("your-project") && !key.includes("your-public")
   ? createClient(url, key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } })
