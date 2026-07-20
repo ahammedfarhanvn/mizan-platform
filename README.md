@@ -38,15 +38,18 @@ NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-public-anon-key
 ```
 
-The interface falls back to local browser storage when Supabase is not configured.
+MĪZĀN does not use demo accounts or browser-storage records. When Supabase is not configured, authentication is paused with a clear setup message so no user can mistake sample data for a real account.
 
 ## Supabase setup
 
 1. Create a Supabase project.
 2. Open the SQL editor.
 3. Run `supabase/migrations/001_mizan_platform.sql`.
-4. Enable the required email authentication options.
-5. Add your local and deployed URLs to the Supabase authentication redirect allowlist.
+4. Run `supabase/migrations/002_working_backend.sql`.
+5. Enable the required email authentication options.
+6. Add your local and deployed URLs to the Supabase authentication redirect allowlist.
+
+The second migration enables authenticated profiles, private cases and event history, verified-Qazi appointments, approved knowledge articles, Masā’il question history, account export, and row-level security for every user-owned record.
 
 ## Deploy to Netlify
 
