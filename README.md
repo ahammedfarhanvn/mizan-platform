@@ -66,6 +66,8 @@ Add these environment variables in Netlify before deploying:
 
 The older `NEXT_PUBLIC_SUPABASE_ANON_KEY` name remains supported for existing deployments, but new Supabase projects should use the publishable key.
 
+This repository is already connected to its intended Supabase project through a browser-safe publishable-key fallback. Deployment environment values override that fallback, which makes project rotation possible without another source change. Database passwords and service-role keys are never included in the client or repository.
+
 ## Important note
 
 MĪZĀN presents educational calculations and preliminary guidance. Complex cases should be reviewed by a qualified scholar before action.
