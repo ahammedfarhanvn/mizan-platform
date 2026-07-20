@@ -28,6 +28,16 @@ export function ScrollDirector() {
         element.style.setProperty("--motion-y", `${y.toFixed(1)}px`);
         element.style.setProperty("--motion-scale", (0.965 + progress * 0.035).toFixed(3));
       });
+
+      const textElements = document.querySelectorAll<HTMLElement>("[data-text-reveal]");
+      textElements.forEach((element) => {
+        const rect = element.getBoundingClientRect();
+        const offset = Number(element.dataset.scrollOffset || 0);
+        const progress = motionQuery.matches ? 1 : clamp((window.innerHeight * 0.91 - rect.top - offset) / (window.innerHeight * 0.28));
+        element.style.setProperty("--text-progress", progress.toFixed(3));
+        element.style.setProperty("--text-y", `${((1 - progress) * 34).toFixed(1)}px`);
+        element.style.setProperty("--text-blur", `${((1 - progress) * 7).toFixed(1)}px`);
+      });
     };
 
     const requestUpdate = () => {
