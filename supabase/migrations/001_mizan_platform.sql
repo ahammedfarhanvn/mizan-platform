@@ -72,18 +72,31 @@ alter table public.qazis enable row level security;
 alter table public.appointments enable row level security;
 alter table public.masala_questions enable row level security;
 
+drop policy if exists "own profile read" on public.profiles;
 create policy "own profile read" on public.profiles for select using (auth.uid()=id);
+drop policy if exists "own profile create" on public.profiles;
 create policy "own profile create" on public.profiles for insert with check (auth.uid()=id);
+drop policy if exists "own profile update" on public.profiles;
 create policy "own profile update" on public.profiles for update using (auth.uid()=id) with check (auth.uid()=id);
+drop policy if exists "own cases read" on public.cases;
 create policy "own cases read" on public.cases for select using (auth.uid()=user_id);
+drop policy if exists "own cases create" on public.cases;
 create policy "own cases create" on public.cases for insert with check (auth.uid()=user_id);
+drop policy if exists "own cases update" on public.cases;
 create policy "own cases update" on public.cases for update using (auth.uid()=user_id) with check (auth.uid()=user_id);
+drop policy if exists "own cases delete" on public.cases;
 create policy "own cases delete" on public.cases for delete using (auth.uid()=user_id);
+drop policy if exists "verified qazi directory" on public.qazis;
 create policy "verified qazi directory" on public.qazis for select using (verification_status='verified');
+drop policy if exists "own appointments read" on public.appointments;
 create policy "own appointments read" on public.appointments for select using (auth.uid()=user_id);
+drop policy if exists "own appointments create" on public.appointments;
 create policy "own appointments create" on public.appointments for insert with check (auth.uid()=user_id);
+drop policy if exists "own appointments update" on public.appointments;
 create policy "own appointments update" on public.appointments for update using (auth.uid()=user_id) with check (auth.uid()=user_id);
+drop policy if exists "own questions read" on public.masala_questions;
 create policy "own questions read" on public.masala_questions for select using (auth.uid()=user_id);
+drop policy if exists "own questions create" on public.masala_questions;
 create policy "own questions create" on public.masala_questions for insert with check (auth.uid()=user_id);
 
--- Use only the public anon key in the website. Keep the service-role key server-side.
+-- Use only the public publishable key in the website. Keep the service-role key server-side.
