@@ -26,12 +26,15 @@ export function HeroScrollStory() {
     };
 
     const update = (now: number) => {
-      const phase = reduceMotion.matches ? 0.72 : ((now - start) % 11000) / 11000;
-      const bag = phase < 0.46 ? 1 : phase < 0.62 ? 1 - ease((phase - 0.46) / 0.16) : phase < 0.9 ? 0 : ease((phase - 0.9) / 0.1);
-      const giving = phase < 0.48 ? 0 : phase < 0.64 ? ease((phase - 0.48) / 0.16) : phase < 0.92 ? 1 : 1 - ease((phase - 0.92) / 0.08);
-      const identify = phase < 0.28 ? 1 : phase < 0.4 ? 1 - ease((phase - 0.28) / 0.12) : phase > 0.9 ? ease((phase - 0.9) / 0.1) : 0;
-      const calculate = phase < 0.22 ? 0 : phase < 0.34 ? ease((phase - 0.22) / 0.12) : phase < 0.56 ? 1 : phase < 0.66 ? 1 - ease((phase - 0.56) / 0.1) : 0;
-      const distribute = phase < 0.56 ? 0 : phase < 0.68 ? ease((phase - 0.56) / 0.12) : phase < 0.92 ? 1 : 1 - ease((phase - 0.92) / 0.08);
+      const phase = reduceMotion.matches ? 0.72 : ((now - start) % 12000) / 12000;
+      const fill = phase < 0.08 ? 0 : phase < 0.4 ? ease((phase - 0.08) / 0.32) : 1;
+      const handoff = phase < 0.4 ? 0 : phase < 0.62 ? ease((phase - 0.4) / 0.22) : 1;
+      const reset = phase < 0.91 ? 0 : ease((phase - 0.91) / 0.09);
+      const bag = Math.max(0, (1 - handoff) * (1 - reset) + reset);
+      const giving = Math.max(0, handoff * (1 - reset));
+      const identify = phase < 0.18 ? 1 : phase < 0.3 ? 1 - ease((phase - 0.18) / 0.12) : 0;
+      const calculate = phase < 0.18 ? 0 : phase < 0.34 ? ease((phase - 0.18) / 0.16) : phase < 0.5 ? 1 : 1 - ease((phase - 0.5) / 0.12);
+      const distribute = phase < 0.5 ? 0 : phase < 0.66 ? ease((phase - 0.5) / 0.16) : phase < 0.91 ? 1 : 1 - reset;
       const float = reduceMotion.matches ? 0 : Math.sin(phase * Math.PI * 8);
 
       element.style.setProperty("--story-progress", phase.toFixed(3));
@@ -40,11 +43,22 @@ export function HeroScrollStory() {
       element.style.setProperty("--identify-opacity", identify.toFixed(3));
       element.style.setProperty("--calculate-opacity", calculate.toFixed(3));
       element.style.setProperty("--distribute-opacity", distribute.toFixed(3));
-      element.style.setProperty("--bag-scale", (0.88 + bag * 0.12).toFixed(3));
-      element.style.setProperty("--giving-scale", (0.91 + giving * 0.09).toFixed(3));
-      element.style.setProperty("--bag-y", `${(-28 * (1 - bag) + float * 5).toFixed(1)}px`);
-      element.style.setProperty("--giving-y", `${(34 * (1 - giving) + float * -3).toFixed(1)}px`);
-      element.style.setProperty("--story-progress-width", `${(phase * 100).toFixed(1)}%`);
+      element.style.setProperty("--bag-scale", (0.9 + fill * 0.11 - handoff * 0.08).toFixed(3));
+      element.style.setProperty("--giving-scale", (0.92 + giving * 0.08).toFixed(3));
+      element.style.setProperty("--bag-y", `${(-34 * handoff + float * (1 - handoff) * 4).toFixed(1)}px`);
+      element.style.setProperty("--bag-x", `${(46 * handoff).toFixed(1)}px`);
+      element.style.setProperty("--giving-y", `${(28 * (1 - giving) + float * -2).toFixed(1)}px`);
+      element.style.setProperty("--fill-progress", fill.toFixed(3));
+      element.style.setProperty("--handoff-progress", handoff.toFixed(3));
+      element.style.setProperty("--coin-opacity", ((1 - handoff) * Math.min(1, fill * 3)).toFixed(3));
+      element.style.setProperty("--giving-reveal", `${(handoff * 78).toFixed(1)}%`);
+      element.style.setProperty("--bag-rotate-y", `${(-2 + handoff * 7).toFixed(2)}deg`);
+      element.style.setProperty("--bag-rotate-z", `${(handoff * 3).toFixed(2)}deg`);
+      element.style.setProperty("--fill-glow-opacity", (fill * 0.8).toFixed(3));
+      element.style.setProperty("--fill-glow-scale", (0.2 + fill * 0.8).toFixed(3));
+      element.style.setProperty("--fill-caption-opacity", (1 - handoff).toFixed(3));
+      element.style.setProperty("--fill-caption-y", `${(-8 * handoff).toFixed(1)}px`);
+      element.style.setProperty("--give-caption-y", `${(14 * (1 - handoff)).toFixed(1)}px`);
       element.dataset.phase = distribute > 0.5 ? "distribute" : calculate > 0.5 ? "calculate" : "identify";
 
       if (!reduceMotion.matches) frame = window.requestAnimationFrame(update);
@@ -80,25 +94,24 @@ export function HeroScrollStory() {
 
       <div className="wealth-visual" aria-label="A money bag changes into a scene of giving in a continuous animation">
         <div className="wealth-aura" aria-hidden="true" />
-        <div className="wealth-visual-label"><i /><span>Live wealth journey</span><b>11 sec cycle</b></div>
+        <div className="wealth-visual-label"><i /><span>Cinematic wealth journey</span><b>12 sec motion</b></div>
         <div className="wealth-orbit wealth-orbit-primary" aria-hidden="true"><i /><i /></div>
         <div className="wealth-orbit wealth-orbit-secondary" aria-hidden="true"><i /></div>
+        <div className="coin-stream" aria-hidden="true">{Array.from({ length: 11 }).map((_, index) => <i key={index} style={{"--coin-left": `${31 + index * 3.8}%`, "--coin-delay": `${index * -0.17}s`, "--coin-rotation": `${index * 24}deg`} as React.CSSProperties}><span>{index % 3 === 0 ? "₹" : ""}</span></i>)}</div>
+        <div className="bag-fill-glow" aria-hidden="true" />
 
         <figure className="wealth-frame wealth-bag-frame">
           <div className="wealth-image-surface"><img src="/landing/wealth-bag-transparent.png" alt="A large green money bag representing the wealth to be assessed" /></div>
-          <figcaption><span>01</span><div><small>Begin with clarity</small><strong>Understand what you own</strong></div></figcaption>
         </figure>
 
         <figure className="wealth-frame wealth-giving-frame">
           <div className="wealth-image-surface"><img src="/landing/wealth-giving-transparent.png" alt="A person giving a money bag to someone in need" /></div>
-          <figcaption><span>02</span><div><small>Continue with purpose</small><strong>Give where it matters</strong></div></figcaption>
         </figure>
 
         <div className="wealth-status status-identify"><WalletCards /><small>Identify</small><strong>Map eligible wealth</strong></div>
         <div className="wealth-status status-calculate"><CircleCheck /><small>Calculate</small><strong>Know what is due</strong></div>
         <div className="wealth-status status-distribute"><HandCoins /><small>Distribute</small><strong>Act with confidence</strong></div>
-        <div className="wealth-progress" aria-hidden="true"><span /><i /></div>
-        <div className="wealth-cycle-labels" aria-hidden="true"><span>Identify</span><span>Calculate</span><span>Distribute</span></div>
+        <div className="motion-caption" aria-hidden="true"><span className="caption-fill"><small>01 · Clarify</small><strong>Map and understand the wealth</strong></span><span className="caption-give"><small>02 · Fulfil</small><strong>Move from calculation to purposeful giving</strong></span></div>
       </div>
     </div>
   </section>;
