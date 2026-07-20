@@ -2,8 +2,10 @@ import { createClient } from "@supabase/supabase-js";
 import type { AppointmentRecord, CaseRecord, CaseType, KnowledgeArticle, MasalaQuestionRecord, ProfileRecord, QaziRecord, VerificationStatus } from "./models";
 import { normalizeMadhhab } from "./models";
 
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://vdyrzevopjszjxmpuyfg.supabase.co";
+const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+  || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  || "sb_publishable_wlMqjDpDPxRzR_O-9ZwF8A_NpysE52O";
 
 export const supabase = url && key && !url.includes("your-project") && !key.includes("your-public")
   ? createClient(url, key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } })
