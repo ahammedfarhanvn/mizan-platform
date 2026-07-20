@@ -35,7 +35,7 @@ Add your Supabase project values to `.env.local`:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-public-anon-key
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-public-publishable-key
 ```
 
 MĪZĀN does not use demo accounts or browser-storage records. When Supabase is not configured, authentication is paused with a clear setup message so no user can mistake sample data for a real account.
@@ -62,7 +62,9 @@ Connect this repository in Netlify. The included `netlify.toml` provides:
 Add these environment variables in Netlify before deploying:
 
 - `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+
+The older `NEXT_PUBLIC_SUPABASE_ANON_KEY` name remains supported for existing deployments, but new Supabase projects should use the publishable key.
 
 ## Important note
 
