@@ -67,15 +67,15 @@ export function HeroScrollStory() {
   return <section className="wealth-story" ref={section} aria-label="From clear wealth to purposeful giving">
     <div className="wealth-sticky page-width">
       <div className="hero-copy wealth-copy">
-        <span className="eyebrow"><Sparkles /> Scholarship, organised with intelligence</span>
-        <h1>Madhhab-aware <em>clarity.</em><br />Confident <em>calculations.</em></h1>
-        <p className="hero-lead">A trusted digital workspace for Zakat, Farā’iḍ and modern Masā’il—designed around the recognised sources of the four Sunni madhhabs.</p>
-        <p className="tagline">Identify. Calculate. Verify. Distribute.</p>
-        <div className="hero-buttons">
+        <span className="eyebrow" data-hero-text style={{"--hero-delay":"80ms"} as React.CSSProperties}><Sparkles /> A live, guided wealth journey</span>
+        <h1 data-hero-text style={{"--hero-delay":"150ms"} as React.CSSProperties}>Clarify your <em>wealth.</em><br />Give with <em>confidence.</em></h1>
+        <p className="hero-lead" data-hero-text style={{"--hero-delay":"250ms"} as React.CSSProperties}>See what is eligible, understand what is due and move from careful calculation to purposeful giving through one clear journey.</p>
+        <p className="tagline" data-hero-text style={{"--hero-delay":"330ms"} as React.CSSProperties}>Understand. Calculate. Verify. Give.</p>
+        <div className="hero-buttons" data-hero-text style={{"--hero-delay":"410ms"} as React.CSSProperties}>
           <Link className="primary-button" href="/auth?mode=signup">Create your account <ArrowRight /></Link>
           <Link className="ghost-button" href="#platform">Explore the platform <ArrowRight /></Link>
         </div>
-        <div className="trust-line"><span><ShieldCheck /> Scholar-supervised</span><span><BookOpen /> Source-noted</span><span><LockKeyhole /> Privacy-first</span></div>
+        <div className="trust-line" data-hero-text style={{"--hero-delay":"490ms"} as React.CSSProperties}><span><ShieldCheck /> Scholar-supervised</span><span><BookOpen /> Source-noted</span><span><LockKeyhole /> Privacy-first</span></div>
       </div>
 
       <div className="wealth-visual" aria-label="A money bag changes into a scene of giving in a continuous animation">
