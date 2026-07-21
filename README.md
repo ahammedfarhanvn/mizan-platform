@@ -46,16 +46,10 @@ MĪZĀN does not use demo accounts or browser-storage records. When Supabase is 
 2. Open the SQL editor.
 3. Run `supabase/migrations/001_mizan_platform.sql`.
 4. Run `supabase/migrations/002_working_backend.sql`.
-5. Enable the required email authentication options.
+5. Under **Authentication → Sign In / Providers → Email**, keep email/password signup enabled and turn **Confirm email** off.
 6. Add your local and deployed URLs to the Supabase authentication redirect allowlist.
 
-For scanner-resistant signup confirmation, open **Authentication → Email Templates → Confirm signup** and use this link in the template:
-
-```html
-<a href="{{ .SiteURL }}/auth/confirm/?token_hash={{ .TokenHash }}&type=email">Confirm your email</a>
-```
-
-The `/auth/confirm/` route verifies the token hash in the browser. Expired or previously used links lead to a real resend-confirmation workflow instead of leaving the user on an error fragment.
+Email confirmation and resend controls are intentionally disabled for the current launch. New users receive a session immediately and continue directly to onboarding. Confirmation can be restored later together with production SMTP.
 
 The second migration enables authenticated profiles, private cases and event history, verified-Qazi appointments, approved knowledge articles, Masā’il question history, account export, and row-level security for every user-owned record.
 
