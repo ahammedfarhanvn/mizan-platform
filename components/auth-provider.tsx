@@ -22,6 +22,7 @@ type AuthState = {
   configured: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, fullName: string) => Promise<{ needsEmailConfirmation: boolean }>;
+  resendConfirmation: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
   updateProfile: (profile: Partial<MizanProfile>) => Promise<void>;
   requestPasswordReset: (email: string) => Promise<void>;
@@ -112,7 +113,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     },
     async signUp(email, password, fullName) {
       if (!supabase) throw new Error("The Supabase backend is not configured.");
-      const redirectTo = typeof window === "undefined" ? undefined : `${window.location.origin}/auth/`;
+      const redirectTo = typeof window === "undefined" ? undefined : `${window.location.origin}/auth/confirm/`;
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
@@ -124,6 +125,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await hydrateProfile(data.user);
       }
       return { needsEmailConfirmation: !data.session };
+    },
+    async resendConfirmation(email) {
+      if (!supabase) throw new Error("The Supabase backend is not configured.");
+      const redirectTo = `${window.location.origin}/auth/confirm/`;
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: email.trim(),
+        options: { emailRedirectTo: redirectTo },
+      });
+      if (error) throw error;
     },
     async signOut() {
       if (supabase) {
