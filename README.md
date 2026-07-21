@@ -49,6 +49,14 @@ MĪZĀN does not use demo accounts or browser-storage records. When Supabase is 
 5. Enable the required email authentication options.
 6. Add your local and deployed URLs to the Supabase authentication redirect allowlist.
 
+For scanner-resistant signup confirmation, open **Authentication → Email Templates → Confirm signup** and use this link in the template:
+
+```html
+<a href="{{ .SiteURL }}/auth/confirm/?token_hash={{ .TokenHash }}&type=email">Confirm your email</a>
+```
+
+The `/auth/confirm/` route verifies the token hash in the browser. Expired or previously used links lead to a real resend-confirmation workflow instead of leaving the user on an error fragment.
+
 The second migration enables authenticated profiles, private cases and event history, verified-Qazi appointments, approved knowledge articles, Masā’il question history, account export, and row-level security for every user-owned record.
 
 ## Deploy to Netlify
