@@ -3,54 +3,30 @@
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, Database, Eye, EyeOff, LockKeyhole, Mail, Scale, ShieldCheck } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useState } from "react";
 import { useAuth } from "../../components/auth-provider";
 
 function AuthContent() {
   const params = useSearchParams();
-  const { signIn, signUp, resendConfirmation, requestPasswordReset, configured } = useAuth();
+  const { signIn, signUp, requestPasswordReset, configured } = useAuth();
   const requestedMode = params.get("mode");
-  const [mode, setMode] = useState<"signin" | "signup" | "reset" | "verify">(requestedMode === "signup" ? "signup" : requestedMode === "verify" ? "verify" : "signin");
+  const [mode, setMode] = useState<"signin" | "signup" | "reset">(requestedMode === "signup" ? "signup" : "signin");
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [form, setForm] = useState({ name: "", email: "", password: "" });
 
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      const pendingEmail = window.sessionStorage.getItem("mizan_pending_email") || "";
-      if (pendingEmail) setForm(current => current.email ? current : { ...current, email: pendingEmail });
-      const fragment = new URLSearchParams(window.location.hash.replace(/^#/, ""));
-      const authError = fragment.get("error_description");
-      if (authError) {
-        setMode("verify");
-        setError(decodeURIComponent(authError.replaceAll("+", " ")));
-        window.history.replaceState({}, "", `${window.location.pathname}?mode=verify`);
-      }
-    }, 0);
-    return () => window.clearTimeout(timer);
-  }, []);
-
   async function submit(event: React.FormEvent) {
     event.preventDefault();
     setLoading(true); setError(""); setSuccess("");
     try {
-      if (mode === "verify") {
-        await resendConfirmation(form.email);
-        window.sessionStorage.setItem("mizan_pending_email", form.email.trim());
-        setSuccess("A fresh confirmation email has been sent. Use only the newest email; older links are invalid.");
-      } else if (mode === "reset") {
+      if (mode === "reset") {
         await requestPasswordReset(form.email);
         setSuccess("Password-reset instructions have been sent to your email address.");
       } else if (mode === "signup") {
-        const result = await signUp(form.email, form.password, form.name);
-        if (result.needsEmailConfirmation) {
-          window.sessionStorage.setItem("mizan_pending_email", form.email.trim());
-          setMode("verify");
-          setSuccess("Account created. A confirmation email was sent. Use the newest email to activate your account.");
-        }
-        else window.location.assign("/onboarding/");
+        await signUp(form.email, form.password, form.name);
+        window.location.assign("/onboarding/");
       } else {
         await signIn(form.email, form.password);
         window.location.assign(params.get("next") || "/dashboard/");
@@ -60,14 +36,14 @@ function AuthContent() {
     } finally { setLoading(false); }
   }
 
-  const title = mode === "signup" ? "Set up your MĪZĀN workspace" : mode === "reset" ? "Reset your password" : mode === "verify" ? "Verify your email" : "Sign in to continue";
+  const title = mode === "signup" ? "Set up your MĪZĀN workspace" : mode === "reset" ? "Reset your password" : "Sign in to continue";
   return <main className="auth-page">
     <section className="auth-story"><Link className="brand" href="/"><Scale /><span>MĪZĀN</span></Link><div><span className="eyebrow"><ShieldCheck /> Private by design</span><h1>Your madhhab-aware workspace for careful decisions.</h1><p>Save calculations, build private family cases, ask modern questions and share only what you choose with a qualified reviewer.</p><ul><li><LockKeyhole /> Row-level account protection</li><li><ShieldCheck /> Consent-based review workflow</li><li><Mail /> Traceable consultation history</li></ul></div><small>Educational platform · Not an independent fatwa service</small></section>
-    <section className="auth-panel"><div className="auth-box glass-auth"><span className="eyebrow">{mode === "signup" ? "Create your account" : mode === "reset" ? "Account recovery" : mode === "verify" ? "Email confirmation" : "Welcome back"}</span><h2>{title}</h2><p>{configured ? mode === "verify" ? "Enter your account email to receive a new single-use confirmation link." : "Authentication and private records are secured through Supabase." : "The site owner must connect Supabase before accounts can be used."}</p>
+    <section className="auth-panel"><div className="auth-box glass-auth"><span className="eyebrow">{mode === "signup" ? "Create your account" : mode === "reset" ? "Account recovery" : "Welcome back"}</span><h2>{title}</h2><p>{configured ? "Use your email and password for direct, secure access." : "The site owner must connect Supabase before accounts can be used."}</p>
       {!configured ? <div className="backend-required"><Database/><div><strong>Backend connection required</strong><p>Add the public Supabase URL and anon key to the deployment environment, then redeploy. Demo login has been removed.</p></div></div> : <>
-        {mode !== "reset" && mode !== "verify" && <div className="auth-tabs"><button className={mode === "signin" ? "active" : ""} onClick={() => { setMode("signin"); setError(""); setSuccess(""); }}>Sign in</button><button className={mode === "signup" ? "active" : ""} onClick={() => { setMode("signup"); setError(""); setSuccess(""); }}>Create account</button></div>}
-        <form onSubmit={submit}>{mode === "signup" && <label><span>Full name</span><input required value={form.name} onChange={event => setForm({ ...form, name: event.target.value })} placeholder="Your name" autoComplete="name" /></label>}<label><span>Email address</span><div className="input-icon"><Mail /><input required type="email" value={form.email} onChange={event => setForm({ ...form, email: event.target.value })} placeholder="name@example.com" autoComplete="email" /></div></label>{mode !== "reset" && mode !== "verify" && <label><span>Password</span><div className="input-icon"><LockKeyhole /><input required minLength={8} type={show ? "text" : "password"} value={form.password} onChange={event => setForm({ ...form, password: event.target.value })} placeholder="Minimum 8 characters" autoComplete={mode === "signup" ? "new-password" : "current-password"} /><button type="button" aria-label={show ? "Hide password" : "Show password"} onClick={() => setShow(!show)}>{show ? <EyeOff /> : <Eye />}</button></div></label>}{error && <div className="form-error">{error}</div>}{success && <div className="form-success"><CheckCircle2 />{success}</div>}<button className="primary-button full" disabled={loading}>{loading ? "Please wait…" : mode === "signup" ? "Create account" : mode === "reset" ? "Send reset link" : mode === "verify" ? "Send fresh confirmation email" : "Sign in"}<ArrowRight /></button></form>
-        <button className="auth-link" onClick={() => { setMode(mode === "reset" || mode === "verify" ? "signin" : "reset"); setError(""); setSuccess(""); }}>{mode === "reset" || mode === "verify" ? "Return to sign in" : "Forgot your password?"}</button>
+        {mode !== "reset" && <div className="auth-tabs"><button className={mode === "signin" ? "active" : ""} onClick={() => { setMode("signin"); setError(""); setSuccess(""); }}>Sign in</button><button className={mode === "signup" ? "active" : ""} onClick={() => { setMode("signup"); setError(""); setSuccess(""); }}>Create account</button></div>}
+        <form onSubmit={submit}>{mode === "signup" && <label><span>Full name</span><input required value={form.name} onChange={event => setForm({ ...form, name: event.target.value })} placeholder="Your name" autoComplete="name" /></label>}<label><span>Email address</span><div className="input-icon"><Mail /><input required type="email" value={form.email} onChange={event => setForm({ ...form, email: event.target.value })} placeholder="name@example.com" autoComplete="email" /></div></label>{mode !== "reset" && <label><span>Password</span><div className="input-icon"><LockKeyhole /><input required minLength={8} type={show ? "text" : "password"} value={form.password} onChange={event => setForm({ ...form, password: event.target.value })} placeholder="Minimum 8 characters" autoComplete={mode === "signup" ? "new-password" : "current-password"} /><button type="button" aria-label={show ? "Hide password" : "Show password"} onClick={() => setShow(!show)}>{show ? <EyeOff /> : <Eye />}</button></div></label>}{error && <div className="form-error">{error}</div>}{success && <div className="form-success"><CheckCircle2 />{success}</div>}<button className="primary-button full" disabled={loading}>{loading ? "Please wait…" : mode === "signup" ? "Create account" : mode === "reset" ? "Send reset link" : "Sign in"}<ArrowRight /></button></form>
+        <button className="auth-link" onClick={() => { setMode(mode === "reset" ? "signin" : "reset"); setError(""); setSuccess(""); }}>{mode === "reset" ? "Return to sign in" : "Forgot your password?"}</button>
       </>}
       <small className="auth-legal">Automatic outputs are educational and require qualified verification before sensitive financial or inheritance action.</small>
     </div></section>
