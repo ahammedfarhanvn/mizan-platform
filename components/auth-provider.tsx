@@ -21,8 +21,7 @@ type AuthState = {
   loading: boolean;
   configured: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ needsEmailConfirmation: boolean }>;
-  resendConfirmation: (email: string) => Promise<void>;
+  signUp: (email: string, password: string, fullName: string) => Promise<void>;
   signOut: () => Promise<void>;
   updateProfile: (profile: Partial<MizanProfile>) => Promise<void>;
   requestPasswordReset: (email: string) => Promise<void>;
@@ -113,28 +112,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     },
     async signUp(email, password, fullName) {
       if (!supabase) throw new Error("The Supabase backend is not configured.");
-      const redirectTo = typeof window === "undefined" ? undefined : `${window.location.origin}/auth/confirm/`;
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
-        options: { data: { full_name: fullName.trim() }, emailRedirectTo: redirectTo },
+        options: { data: { full_name: fullName.trim() } },
       });
       if (error) throw error;
-      if (data.user && data.session) {
-        setUser(data.user);
-        await hydrateProfile(data.user);
+      if (!data.user || !data.session) {
+        throw new Error("Account confirmation is still enabled in Supabase. Disable Confirm email in Authentication settings, then try again.");
       }
-      return { needsEmailConfirmation: !data.session };
-    },
-    async resendConfirmation(email) {
-      if (!supabase) throw new Error("The Supabase backend is not configured.");
-      const redirectTo = `${window.location.origin}/auth/confirm/`;
-      const { error } = await supabase.auth.resend({
-        type: "signup",
-        email: email.trim(),
-        options: { emailRedirectTo: redirectTo },
-      });
-      if (error) throw error;
+      setUser(data.user);
+      await hydrateProfile(data.user);
     },
     async signOut() {
       if (supabase) {
