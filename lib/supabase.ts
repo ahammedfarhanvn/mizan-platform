@@ -1,4 +1,4 @@
-import { createClient, type EmailOtpType } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
 import type { AppointmentRecord, CaseRecord, CaseType, KnowledgeArticle, MasalaQuestionRecord, ProfileRecord, QaziRecord, VerificationStatus } from "./models";
 import { normalizeMadhhab } from "./models";
 
@@ -11,16 +11,6 @@ export const supabase = url && key && !url.includes("your-project") && !key.incl
   ? createClient(url, key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } })
   : null;
 export const hasSupabase = Boolean(supabase);
-
-export async function verifyEmailToken(tokenHash: string, type: string) {
-  if (!supabase) throw new Error("The Supabase backend is not configured for this deployment.");
-  const allowed: EmailOtpType[] = ["email", "signup", "invite", "magiclink", "recovery", "email_change"];
-  const otpType = allowed.includes(type as EmailOtpType) ? type as EmailOtpType : "email";
-  const { data, error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: otpType });
-  if (error) throw error;
-  if (!data.session || !data.user) throw new Error("The email was verified, but no account session was created.");
-  return data;
-}
 
 function client() {
   if (!supabase) throw new Error("The Supabase backend is not configured for this deployment.");
