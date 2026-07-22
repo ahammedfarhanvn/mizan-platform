@@ -78,7 +78,7 @@ export function AppShell({ children, title, eyebrow, actions }: { children: Reac
 
   if (loading || !user) return <div className="auth-loading"><Scale /><span>{isMalayalam ? "നിങ്ങളുടെ സ്വകാര്യ പ്രവർത്തനകേന്ദ്രം തയ്യാറാക്കുന്നു…" : "Preparing your private workspace…"}</span></div>;
 
-  return <div className="app-frame warm-app">
+  return <div className="app-frame modern-app">
     <button className={open ? "nav-scrim visible" : "nav-scrim"} aria-label="Close navigation" onClick={() => setOpen(false)} />
     <aside className={open ? "sidebar open" : "sidebar"}>
       <div className="sidebar-head">
