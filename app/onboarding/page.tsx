@@ -20,7 +20,7 @@ export default function Onboarding() {
     finally { setSaving(false); }
   }
 
-  return <main className="onboarding warm-onboarding">
+  return <main className="onboarding">
     <header><div className="brand"><span className="brand-mark"><Scale /></span><span>MĪZĀN</span></div><div className="step-track" aria-label={`Step ${step} of 3`}>{[1, 2, 3].map(number => <span key={number} className={step >= number ? "active" : ""}>{step > number ? <Check /> : number}</span>)}</div></header>
     <section className="onboarding-card">
       <span className="ornament-badge"><Sparkles/></span>
